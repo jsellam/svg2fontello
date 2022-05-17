@@ -67,7 +67,9 @@ async function buildIcons() {
   let types = "";
 
   glyphs.forEach((glyph, index) => {
-    types += `\t${getIconType(glyph["glyph-name"])}: '${glyph["glyph-name"]}',`;
+    types += `\t${getIconType(glyph["glyph-name"])}: 'fontello-${
+      glyph["glyph-name"]
+    }',`;
 
     if (index < glyphs.length - 1) {
       types += "\n";
