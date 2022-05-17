@@ -6,7 +6,7 @@ const parser = require("xml2json");
 
 const baseConf = {};
 const conf = require("rc")("svg2fontello", baseConf);
-console.log(conf);
+
 const website = {
   title: "Genius icons",
   version: 1,
@@ -122,6 +122,8 @@ async function buildIcons() {
     path.resolve(tmpPath, "fontello.eot"),
     path.resolve(outputFontsPath, "fontello.eot")
   );
+
+  await fse.remove(tmpPath);
 }
 
 buildIcons();
