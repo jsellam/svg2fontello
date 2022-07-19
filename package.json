@@ -1,6 +1,6 @@
 {
   "name": "svg2fontello",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "This package can convert svg files to fontello icons",
   "main": "index.js",
   "bin": {
