@@ -44,6 +44,7 @@ async function buildIcons() {
   const outputTypesPath = conf.outputTypes;
   const outputStylesPath = conf.outputStyles;
   const importFontsPath = conf.importFontsPath;
+  const formats = conf.formats || ["eot", "svg", "ttf", "woff", "woff2"];
   const tmpPath = path.resolve(__dirname, "./tmpsvg2fonts");
 
   await svgtofont({
@@ -62,14 +63,25 @@ async function buildIcons() {
   const svg = await fse.readFile(path.resolve(tmpPath, "fontello.svg"));
   const data = parser.toJson(svg);
   const json = JSON.parse(data);
-  const glyphs = json.svg.defs.font.glyph;
+  let glyphs = json.svg.defs.font.glyph;
 
   let types = "";
 
+  if (!(glyphs instanceof Array)) glyphs = [glyphs];
+
+  const isTypescript =
+    outputTypesPath.indexOf(".ts") === outputTypesPath.length - 3;
+
   glyphs.forEach((glyph, index) => {
-    types += `\t${getIconType(glyph["glyph-name"])}: 'fontello-${
-      glyph["glyph-name"]
-    }',`;
+    if (isTypescript) {
+      types += `\t${getIconType(glyph["glyph-name"])} = 'fontello-${
+        glyph["glyph-name"]
+      }',`;
+    } else {
+      types += `\t${getIconType(glyph["glyph-name"])}: 'fontello-${
+        glyph["glyph-name"]
+      }',`;
+    }
 
     if (index < glyphs.length - 1) {
       types += "\n";
@@ -81,49 +93,74 @@ async function buildIcons() {
     });
   });
 
-  const jsTypes = `const IconTypes = {
-    ${types}
-    };
-    
-    export default IconTypes;
-    `;
+  let jsTypes = isTypescript
+    ? `enum IconTypes {
+${types}
+}
+export default IconTypes;
+`
+    : `const IconTypes = {
+${types}
+};
+export default IconTypes;
+`;
 
+  await fse.ensureFile(outputTypesPath);
   await fse.writeFile(outputTypesPath, jsTypes, "utf8");
 
   //scss file wor web version
-  let css = await fse.readFile(path.resolve(tmpPath, "fontello.css"), "utf8");
-  while (css.indexOf("url('fontello") > -1) {
-    css = css.replace("url('fontello", "url('" + importFontsPath + "fontello");
-  }
+  if (outputStylesPath) {
+    await fse.ensureDir(outputStylesPath);
+    let css = await fse.readFile(path.resolve(tmpPath, "fontello.css"), "utf8");
+    while (css.indexOf("url('fontello") > -1) {
+      css = css.replace(
+        "url('fontello",
+        "url('" + importFontsPath + "fontello"
+      );
+    }
 
-  while (css.indexOf('url("fontello') > -1) {
-    css = css.replace('url("fontello', 'url("' + importFontsPath + "fontello");
-  }
+    while (css.indexOf('url("fontello') > -1) {
+      css = css.replace(
+        'url("fontello',
+        'url("' + importFontsPath + "fontello"
+      );
+    }
 
-  await fse.writeFile(outputStylesPath, css, "utf8");
+    await fse.writeFile(outputStylesPath, css, "utf8");
+  }
 
   //copy font files
-  await fse.copy(
-    path.resolve(tmpPath, "fontello.svg"),
-    path.resolve(outputFontsPath, "fontello.svg")
-  );
-  await fse.copy(
-    path.resolve(tmpPath, "fontello.ttf"),
-    path.resolve(outputFontsPath, "fontello.ttf")
-  );
-
-  await fse.copy(
-    path.resolve(tmpPath, "fontello.woff"),
-    path.resolve(outputFontsPath, "fontello.woff")
-  );
-  await fse.copy(
-    path.resolve(tmpPath, "fontello.woff2"),
-    path.resolve(outputFontsPath, "fontello.woff2")
-  );
-  await fse.copy(
-    path.resolve(tmpPath, "fontello.eot"),
-    path.resolve(outputFontsPath, "fontello.eot")
-  );
+  await fse.ensureDir(outputFontsPath);
+  if (formats.includes("svg")) {
+    await fse.copy(
+      path.resolve(tmpPath, "fontello.svg"),
+      path.resolve(outputFontsPath, "fontello.svg")
+    );
+  }
+  if (formats.includes("ttf")) {
+    await fse.copy(
+      path.resolve(tmpPath, "fontello.ttf"),
+      path.resolve(outputFontsPath, "fontello.ttf")
+    );
+  }
+  if (formats.includes("woff")) {
+    await fse.copy(
+      path.resolve(tmpPath, "fontello.woff"),
+      path.resolve(outputFontsPath, "fontello.woff")
+    );
+  }
+  if (formats.includes("woff2")) {
+    await fse.copy(
+      path.resolve(tmpPath, "fontello.woff2"),
+      path.resolve(outputFontsPath, "fontello.woff2")
+    );
+  }
+  if (formats.includes("eot")) {
+    await fse.copy(
+      path.resolve(tmpPath, "fontello.eot"),
+      path.resolve(outputFontsPath, "fontello.eot")
+    );
+  }
 
   await fse.remove(tmpPath);
 }
