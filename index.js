@@ -43,6 +43,7 @@ async function buildIcons() {
   const outputFontsPath = conf.outputFonts;
   const outputTypesPath = conf.outputTypes;
   const outputStylesPath = conf.outputStyles;
+  const fontelloConfigPath = conf.fontelloConfig;
   const importFontsPath = conf.importFontsPath;
   const formats = conf.formats || ["eot", "svg", "ttf", "woff", "woff2"];
   const tmpPath = path.resolve(__dirname, "./tmpsvg2fonts");
@@ -107,6 +108,26 @@ export default IconTypes;
 
   await fse.ensureFile(outputTypesPath);
   await fse.writeFile(outputTypesPath, jsTypes, "utf8");
+
+  if (fontelloConfigPath) {
+    const fontelloConfig = {
+      name: "fontello",
+      css_prefix_text: "fontello-",
+      css_use_suffix: false,
+      hinting: true,
+      units_per_em: 1000,
+      ascent: 850,
+      glyphs: glyphs.map((glyph) => {
+        return {
+          css: glyph["glyph-name"],
+          code: glyph.unicode.charCodeAt(0),
+        };
+      }),
+    };
+
+    await fse.ensureFile(fontelloConfigPath);
+    await fse.writeJSON(fontelloConfigPath, fontelloConfig);
+  }
 
   //scss file wor web version
   if (outputStylesPath) {
