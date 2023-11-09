@@ -113,7 +113,7 @@ export default IconTypes;
     const fontelloConfig = {
       name: "fontello",
       css_prefix_text: "fontello-",
-      css_use_suffix: false,
+      css_use_suffix: true,
       hinting: true,
       units_per_em: 1000,
       ascent: 850,
