@@ -75,11 +75,11 @@ async function buildIcons() {
 
   glyphs.forEach((glyph, index) => {
     if (isTypescript) {
-      types += `\t${getIconType(glyph["glyph-name"])} = 'fontello-${
+      types += `\t${getIconType(glyph["glyph-name"])} = '${
         glyph["glyph-name"]
       }',`;
     } else {
-      types += `\t${getIconType(glyph["glyph-name"])}: 'fontello-${
+      types += `\t${getIconType(glyph["glyph-name"])}: '${
         glyph["glyph-name"]
       }',`;
     }
@@ -113,7 +113,7 @@ export default IconTypes;
     const fontelloConfig = {
       name: "fontello",
       css_prefix_text: "fontello-",
-      css_use_suffix: true,
+      css_use_suffix: false,
       hinting: true,
       units_per_em: 1000,
       ascent: 850,
