@@ -7,10 +7,8 @@ const parser = require("xml2json");
 const baseConf = {};
 const conf = require("rc")("svg2fontello", baseConf);
 
-
-
 const website = {
-  title: "Genius icons",
+  title: "font icons",
   version: 1,
   logo: "logo.png",
   meta: {

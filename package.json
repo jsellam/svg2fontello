@@ -29,9 +29,9 @@
   },
   "homepage": "https://github.com/jsellam/svg2fontello#readme",
   "dependencies": {
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.1.1",
     "rc": "^1.2.8",
-    "svgtofont": "^3.17.6",
+    "svgtofont": "^4.0.0",
     "xml2json": "^0.12.0"
   }
 }
